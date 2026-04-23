@@ -1,16 +1,36 @@
-# React + Vite
+# Lavie Reading Web
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Hebrew reading app for Lavie (child, ~7 years old). React + Vite web version with full feature parity to the mobile app.
 
-Currently, two official plugins are available:
+**Live**: https://lavie-reading-web.vercel.app
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Stack
 
-## React Compiler
+- React 19, Vite, Tailwind CSS
+- Speech recognition via Web Speech API (Chrome, Edge)
+- LocalStorage for persistence
+- Responsive RTL design (Hebrew)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Features
 
-## Expanding the ESLint configuration
+- **Reading**: Speech recognition → word matching → progress tracking
+- **Parent mode** (PIN: 1979): Per-story stats, screen time deduction, reset
+- **Test mode** (PIN: 1979): Snapshot/restore for iteration
+- **Progression**: Unlock stories sequentially, star scoring (1–3 ⭐ based on WPM)
+- **Streaks**: Track consecutive days & accumulated screen time
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Dev
+
+```bash
+npm install
+npm run dev    # localhost:5173
+npm run build  # production build
+```
+
+## Deploy
+
+```bash
+bash deploy.sh
+```
+
+This builds → deploys to Vercel → aliases to `https://lavie-reading-web.vercel.app`.

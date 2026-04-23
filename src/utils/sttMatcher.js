@@ -31,23 +31,33 @@ function isPhonemeConfusion(a, b) {
 
 function levenshtein(a, b) {
   const m = a.length, n = b.length;
+  if (m === 0) return n;
+  if (n === 0) return m;
+
   const dp = Array.from({ length: m + 1 }, (_, i) =>
     Array.from({ length: n + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0))
   );
+
   for (let i = 1; i <= m; i++) {
     for (let j = 1; j <= n; j++) {
-      const cost = a[i - 1] === b[j - 1] ? 0 : isPhonemeConfusion(a[i - 1], b[j - 1]) ? 0.5 : 1;
-      dp[i][j] =
-        cost === 0
-          ? dp[i - 1][j - 1]
-          : cost + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+      let cost = 1;
+      if (a[i - 1] === b[j - 1]) {
+        cost = 0;
+      } else if (isPhonemeConfusion(a[i - 1], b[j - 1])) {
+        cost = 0.5;
+      }
+
+      dp[i][j] = cost === 0
+        ? dp[i - 1][j - 1]
+        : cost + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
     }
   }
+
   return dp[m][n];
 }
 
 function maxEdits(wordLen) {
-  if (wordLen <= 2) return 1;
+  if (wordLen <= 2) return 0;
   if (wordLen <= 4) return 1;
   if (wordLen <= 6) return 2;
   return 3;
@@ -56,6 +66,7 @@ function maxEdits(wordLen) {
 export function isWordMatch(target, recognized) {
   const t = normalize(target);
   const r = normalize(recognized);
+
   if (!t || !r) return false;
   if (t === r) return true;
 
@@ -64,7 +75,7 @@ export function isWordMatch(target, recognized) {
     if (t.startsWith(r) || r.startsWith(t)) return true;
   }
 
-  const threshold = maxEdits(Math.min(t.length, r.length));
+  const threshold = maxEdits(shorter);
   return levenshtein(t, r) <= threshold;
 }
 
@@ -72,38 +83,28 @@ function matchPhrase(phrase, words, currentIndex) {
   const tokens = phrase.trim().split(/\s+/).filter((w) => w.length > 0);
   if (tokens.length === 0) return { matched: false, advanceTo: currentIndex };
 
-  let anchorTokenIdx = -1;
+  const lastToken = tokens[tokens.length - 1];
   let advanceIdx = currentIndex;
 
-  outer:
-  for (let ti = 0; ti < tokens.length; ti++) {
-    const token = tokens[ti];
-    if (words[advanceIdx] && isWordMatch(token, words[advanceIdx])) {
-      anchorTokenIdx = ti;
-      advanceIdx++;
-      break outer;
-    }
-    if (normalize(token).length >= 2) {
-      for (let skip = 1; skip <= 2; skip++) {
-        if (words[advanceIdx + skip] && isWordMatch(token, words[advanceIdx + skip])) {
-          anchorTokenIdx = ti;
-          advanceIdx += skip + 1;
-          break outer;
-        }
+  if (words[advanceIdx] && isWordMatch(lastToken, words[advanceIdx])) {
+    advanceIdx++;
+  } else if (normalize(lastToken).length >= 3) {
+    for (let skip = 1; skip <= 2; skip++) {
+      if (words[advanceIdx + skip] && isWordMatch(lastToken, words[advanceIdx + skip])) {
+        advanceIdx += skip + 1;
+        return { matched: true, advanceTo: advanceIdx };
       }
     }
   }
 
-  if (anchorTokenIdx < 0) return { matched: false, advanceTo: currentIndex };
-
-  for (let ti = anchorTokenIdx + 1; ti < tokens.length; ti++) {
-    if (advanceIdx >= words.length) break;
-    if (isWordMatch(tokens[ti], words[advanceIdx])) {
-      advanceIdx++;
-    } else break;
+  if (tokens.length >= 2) {
+    const prevToken = tokens[tokens.length - 2];
+    if (words[advanceIdx] && isWordMatch(prevToken, words[advanceIdx])) {
+      return { matched: true, advanceTo: advanceIdx };
+    }
   }
 
-  return { matched: true, advanceTo: advanceIdx };
+  return { matched: false, advanceTo: currentIndex };
 }
 
 export function matchTranscriptToWord(phrases, words, currentIndex) {

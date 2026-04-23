@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import storiesData from '../data/stories.json';
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition';
-import { matchTranscriptToWord, stripNikud } from '../utils/sttMatcher';
-
-const HINT_THRESHOLDS = [0, 4, 7, 10, 15];
+import { useWordHint } from '../hooks/useWordHint';
+import { useReadingSession } from '../hooks/useReadingSession';
+import { stripNikud } from '../utils/sttMatcher';
+import { useApp } from '../context/AppContext';
 
 function stripPunctuation(text) {
   return text.replace(/[.,!?"״]/g, '');
@@ -64,17 +65,6 @@ function splitWordByProgress(word, lettersRead) {
   return [read, unread];
 }
 
-function speakWord(word) {
-  const clean = word.replace(/[\u0591-\u05C7.,!?"״]/g, '');
-  if (window.speechSynthesis) {
-    window.speechSynthesis.cancel();
-    const utt = new SpeechSynthesisUtterance(clean);
-    utt.lang = 'he-IL';
-    utt.rate = 0.75;
-    window.speechSynthesis.speak(utt);
-  }
-}
-
 function playBleep() {
   const ctx = new (window.AudioContext || window.webkitAudioContext)();
   const osc = ctx.createOscillator();
@@ -90,103 +80,49 @@ function playBleep() {
 }
 
 export default function StoryScreen({ storyId, onBack }) {
+  const { completeStory } = useApp();
   const storyObj = storiesData.stories.find(s => s.id === storyId);
   if (!storyObj) return <div>Story not found</div>;
 
-  const allWords = storyObj.sentences.flat();
-  const totalWords = allWords.length;
+  const {
+    currentWordIndex,
+    allWords,
+    advance,
+    isComplete,
+    sessionStats,
+    completeSession,
+  } = useReadingSession({
+    sentences: storyObj.sentences,
+    language: 'he',
+  });
 
-  const [currentWordIndex, setCurrentWordIndex] = useState(0);
-  const [hintLevel, setHintLevel] = useState(0);
-  const [completed, setCompleted] = useState(false);
   const [showLetterBreak, setShowLetterBreak] = useState(false);
   const [lettersReadInWord, setLettersReadInWord] = useState(0);
-  const [stars, setStars] = useState(0);
-  const [timeSeconds, setTimeSeconds] = useState(0);
-
-  const currentIndexRef = useRef(0);
-  const completedRef = useRef(false);
-  const startTimeRef = useRef(Date.now());
-  const wordStartTimeRef = useRef(Date.now());
   const prevTranscriptRef = useRef('');
-  const hasSpokenHintRef = useRef(false);
-  const hintIntervalRef = useRef(null);
 
-  const startHintTimer = useCallback((onAutoAdvance) => {
-    if (hintIntervalRef.current) clearInterval(hintIntervalRef.current);
-    wordStartTimeRef.current = Date.now();
+  const totalWords = allWords.length;
 
-    hintIntervalRef.current = setInterval(() => {
-      if (completedRef.current) return;
-      const elapsed = (Date.now() - wordStartTimeRef.current) / 1000;
+  const { hintLevel, syllables } = useWordHint({
+    currentWordIndex,
+    currentWord: allWords[currentWordIndex],
+    isComplete,
+    started: true,
+    onAutoAdvance: () => advance(currentWordIndex + 1),
+    lang: 'he',
+  });
 
-      let level = 0;
-      for (let i = HINT_THRESHOLDS.length - 1; i >= 0; i--) {
-        if (elapsed >= HINT_THRESHOLDS[i]) { level = i; break; }
-      }
-
-      setHintLevel(level);
-
-      if (level === 3 && !hasSpokenHintRef.current) {
-        hasSpokenHintRef.current = true;
-        const word = allWords[currentIndexRef.current];
-        if (word) speakWord(word);
-      }
-
-      if (level >= 4) {
-        clearInterval(hintIntervalRef.current);
-        playBleep();
-        onAutoAdvance();
-      }
-    }, 500);
-  }, [allWords]);
-
-  const advanceTo = useCallback((nextIndex) => {
-    if (hintIntervalRef.current) clearInterval(hintIntervalRef.current);
-    setHintLevel(0);
-    setShowLetterBreak(false);
-    setLettersReadInWord(0);
-    hasSpokenHintRef.current = false;
-
-    if (nextIndex >= totalWords) {
-      const t = Math.round((Date.now() - startTimeRef.current) / 1000);
-      const wpm = t > 0 ? Math.round((totalWords / t) * 60) : 0;
-      let s = 1;
-      if (wpm > 40) s = 3;
-      else if (wpm > 20) s = 2;
-      setStars(s);
-      setTimeSeconds(t);
-      completedRef.current = true;
-      setCompleted(true);
-      return;
-    }
-
-    currentIndexRef.current = nextIndex;
-    setCurrentWordIndex(nextIndex);
-
-    startHintTimer(() => {
-      const next = currentIndexRef.current + 1;
-      hasSpokenHintRef.current = false;
-      currentIndexRef.current = next;
-      setCurrentWordIndex(next);
-      if (next >= totalWords) {
-        const t = Math.round((Date.now() - startTimeRef.current) / 1000);
-        const wpm = t > 0 ? Math.round((totalWords / t) * 60) : 0;
-        let s = 1;
-        if (wpm > 40) s = 3;
-        else if (wpm > 20) s = 2;
-        setStars(s);
-        setTimeSeconds(t);
-        completedRef.current = true;
-        setCompleted(true);
-      }
-    });
-  }, [totalWords, startHintTimer]);
+  const isWordMatch = useCallback((target, recognized) => {
+    const t = normalizeForMatching(target);
+    const r = normalizeForMatching(recognized);
+    if (!t || !r) return false;
+    if (t === r) return true;
+    return Math.abs(t.length - r.length) <= 1;
+  }, []);
 
   const handleTranscript = useCallback((transcripts, isFinal) => {
-    if (completedRef.current) return;
+    if (isComplete) return;
 
-    const primary = transcripts[0] ?? '';
+    const primary = (Array.isArray(transcripts) ? transcripts[0] : transcripts) ?? '';
     const prev = prevTranscriptRef.current;
     let delta = primary;
     if (prev && primary.startsWith(prev)) {
@@ -195,21 +131,41 @@ export default function StoryScreen({ storyId, onBack }) {
 
     const phrasesToTry = [
       ...(delta ? [delta] : []),
-      ...transcripts.slice(1),
+      ...(Array.isArray(transcripts) ? transcripts.slice(1) : []),
     ];
 
     if (phrasesToTry.length === 0) return;
 
-    const result = matchTranscriptToWord(phrasesToTry, allWords, currentIndexRef.current);
-    if (result.matched) {
-      playBleep();
-      setShowLetterBreak(false);
-      setLettersReadInWord(0);
-      advanceTo(result.advanceTo);
-    } else {
+    let matched = false;
+
+    for (const phrase of phrasesToTry) {
+      const tokens = phrase.trim().split(/\s+/).filter(w => w.length > 0);
+      if (tokens.length === 0) continue;
+
+      const lastToken = tokens[tokens.length - 1];
+
+      if (isWordMatch(lastToken, allWords[currentWordIndex])) {
+        playBleep();
+        advance(currentWordIndex + 1);
+        matched = true;
+        break;
+      } else if (normalizeForMatching(lastToken).length >= 3) {
+        for (let skip = 1; skip <= 2; skip++) {
+          if (allWords[currentWordIndex + skip] && isWordMatch(lastToken, allWords[currentWordIndex + skip])) {
+            playBleep();
+            advance(currentWordIndex + skip + 1);
+            matched = true;
+            break;
+          }
+        }
+        if (matched) break;
+      }
+    }
+
+    if (!matched) {
       let maxLettersRead = 0;
       for (const phrase of phrasesToTry) {
-        const letters = getLettersReadInWord(allWords[currentIndexRef.current], phrase);
+        const letters = getLettersReadInWord(allWords[currentWordIndex], phrase);
         maxLettersRead = Math.max(maxLettersRead, letters);
       }
       setLettersReadInWord(maxLettersRead);
@@ -217,9 +173,13 @@ export default function StoryScreen({ storyId, onBack }) {
       if (isFinal && phrasesToTry.some((p) => p.trim().length > 1)) {
         setShowLetterBreak(true);
       }
+    } else {
+      setShowLetterBreak(false);
+      setLettersReadInWord(0);
     }
+
     if (isFinal) prevTranscriptRef.current = primary;
-  }, [allWords, advanceTo]);
+  }, [allWords, currentWordIndex, advance, isComplete, isWordMatch]);
 
   const { isListening, isSupported, start, stop } = useSpeechRecognition({
     lang: 'he-IL',
@@ -229,17 +189,24 @@ export default function StoryScreen({ storyId, onBack }) {
   useEffect(() => {
     if (isSupported) {
       start();
-      startHintTimer(() => advanceTo(currentIndexRef.current + 1));
     }
     return () => {
       stop();
-      if (hintIntervalRef.current) clearInterval(hintIntervalRef.current);
       if (window.speechSynthesis) window.speechSynthesis.cancel();
     };
-  }, []);
+  }, [isSupported, start, stop]);
 
-  const strippedHint = hintLevel >= 2 ? stripNikud(allWords[currentIndexRef.current]) : '';
-  const visibleSentenceIndex = Math.floor(currentWordIndex / 100); // Rough estimation
+  useEffect(() => {
+    if (isComplete && sessionStats) {
+      completeStory(storyId, sessionStats.starsEarned, {
+        timeSeconds: sessionStats.durationSeconds,
+        wordsRead: sessionStats.wordsRead,
+        wpm: sessionStats.wordsPerMinute,
+        accuracy: sessionStats.accuracy,
+        completedAt: new Date().toISOString(),
+      });
+    }
+  }, [isComplete, sessionStats, storyId, completeStory]);
 
   return (
     <div className="min-h-screen bg-white flex flex-col text-right" dir="rtl">
@@ -275,10 +242,10 @@ export default function StoryScreen({ storyId, onBack }) {
       )}
 
       {/* Hints */}
-      {hintLevel >= 2 && !showLetterBreak && (
+      {hintLevel >= 2 && !showLetterBreak && syllables && (
         <div className="flex justify-center mt-4">
           <div className="bg-yellow-100 border-2 border-yellow-400 rounded-lg px-4 py-2">
-            <p className="text-lg font-bold text-gray-700 font-mono">{strippedHint}</p>
+            <p className="text-lg font-bold text-gray-700 font-mono">{syllables}</p>
           </div>
         </div>
       )}
@@ -348,16 +315,16 @@ export default function StoryScreen({ storyId, onBack }) {
       </div>
 
       {/* Completion Screen */}
-      {completed && (
+      {isComplete && sessionStats && (
         <div className="bg-gradient-to-b from-blue-50 to-white p-6 border-t-2 border-blue-200 text-center">
           <p className="text-lg font-bold text-gray-900 mb-3">🎉 Story Complete!</p>
           <div className="text-4xl mb-3">
             {Array.from({ length: 3 }).map((_, i) => (
-              <span key={i}>{i < stars ? '⭐' : '☆'}</span>
+              <span key={i}>{i < sessionStats.starsEarned ? '⭐' : '☆'}</span>
             ))}
           </div>
           <p className="text-sm text-gray-600 mb-4">
-            {timeSeconds}s • {Math.round((totalWords / timeSeconds) * 60)} WPM
+            {sessionStats.durationSeconds}s • {sessionStats.wordsPerMinute} WPM • {Math.round(sessionStats.accuracy * 100)}%
           </p>
           <button
             onClick={onBack}
@@ -369,7 +336,7 @@ export default function StoryScreen({ storyId, onBack }) {
       )}
 
       {/* Mic Bar */}
-      {!completed && (
+      {!isComplete && (
         <div className="bg-white border-t-2 border-gray-200 p-4 flex justify-center gap-3">
           <button
             onClick={isListening ? stop : start}
