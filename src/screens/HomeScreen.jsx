@@ -113,18 +113,9 @@ export default function HomeScreen({ onSelectStory }) {
   }
 
   return (
-    <div dir="rtl" className="min-h-screen bg-gradient-to-b from-blue-400 to-blue-300 flex flex-col overflow-hidden">
-      {/* Scenic background */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-48 h-32 opacity-80">
-          <svg viewBox="0 0 200 160" className="w-full h-full">
-            <ellipse cx="100" cy="50" rx="60" ry="40" fill="white" opacity="0.7"/>
-            <ellipse cx="140" cy="60" rx="45" ry="35" fill="white" opacity="0.6"/>
-            <ellipse cx="60" cy="70" rx="50" ry="30" fill="white" opacity="0.65"/>
-          </svg>
-        </div>
-        <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-green-600 to-green-500 opacity-90"></div>
-      </div>
+    <div dir="rtl" className="min-h-screen flex flex-col overflow-hidden" style={{ backgroundImage: `url(${require('../assets/home-background.webp')})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+      {/* Background image overlay */}
+      <div className="absolute inset-0 pointer-events-none"></div>
 
       {/* Content */}
       <div className="relative z-10 flex-1 flex flex-col p-6 max-w-3xl mx-auto w-full">
