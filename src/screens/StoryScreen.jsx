@@ -257,7 +257,7 @@ export default function StoryScreen({ storyId, onBack }) {
 
       {/* Words Container */}
       <div className="flex-1 overflow-y-auto p-8 flex flex-col items-center justify-center">
-        <div className="max-w-3xl w-full">
+        <div className="max-w-4xl w-full leading-relaxed" style={{ wordSpacing: '0.5rem' }}>
           {allWords.map((word, idx) => {
             const isPast = idx < currentWordIndex;
             const isActive = idx === currentWordIndex;
@@ -282,11 +282,15 @@ export default function StoryScreen({ storyId, onBack }) {
                 return (
                   <span
                     key={idx}
-                    className="inline-block mx-2 px-3 py-2 rounded-lg transition text-2xl font-semibold"
                     style={{
+                      display: 'inline',
                       backgroundColor: bgColor,
                       color: textColor,
                       opacity: isPast ? 0.4 : 1,
+                      padding: '8px 12px',
+                      borderRadius: '8px',
+                      fontSize: '28px',
+                      fontWeight: '600',
                     }}
                   >
                     <span style={{ color: '#0984e3' }}>{read}</span>
@@ -299,11 +303,15 @@ export default function StoryScreen({ storyId, onBack }) {
             return (
               <span
                 key={idx}
-                className="inline-block mx-2 px-3 py-2 rounded-lg transition text-2xl font-semibold"
                 style={{
+                  display: 'inline',
                   backgroundColor: bgColor,
                   color: textColor,
                   opacity: isPast ? 0.4 : 1,
+                  padding: '8px 12px',
+                  borderRadius: '8px',
+                  fontSize: '28px',
+                  fontWeight: '600',
                 }}
               >
                 {displayWord}
