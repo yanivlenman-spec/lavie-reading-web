@@ -3,6 +3,9 @@ import { useApp } from '../context/AppContext';
 import { STORIES } from '../data/stories';
 import PinInput from '../components/PinInput';
 import homeBackground from '../assets/home-background.webp';
+import navHome from '../assets/nav-home.png';
+import navRead from '../assets/nav-read.png';
+import navAwards from '../assets/nav-awards.png';
 
 const DAY_NAMES = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
 const DIFFICULTY_LABEL = { 1: 'קל ⭐', 2: 'בינוני ⭐⭐', 3: 'מאתגר ⭐⭐⭐' };
@@ -67,6 +70,7 @@ export default function HomeScreen({ onSelectStory }) {
   const [parentMode, setParentMode] = useState('locked');
   const [showTestPin, setShowTestPin] = useState(false);
   const [deductAmount, setDeductAmount] = useState('');
+  const [activeTab, setActiveTab] = useState('Home');
 
   const totalStars = Object.values(state.storyStars).reduce((sum, s) => sum + s, 0);
   const today = new Date();
@@ -115,11 +119,10 @@ export default function HomeScreen({ onSelectStory }) {
 
   return (
     <div dir="rtl" className="min-h-screen flex flex-col overflow-hidden" style={{ backgroundImage: `url(${homeBackground})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
-      {/* Background image overlay */}
       <div className="absolute inset-0 pointer-events-none"></div>
 
-      {/* Content */}
-      <div className="relative z-10 flex-1 flex flex-col p-4 sm:p-6 md:p-8 max-w-sm sm:max-w-2xl md:max-w-4xl mx-auto w-full">
+      <div className="relative z-10 flex-1 overflow-y-auto" style={{ paddingBottom: '75px' }}>
+        <div className="flex flex-col p-4 sm:p-6 md:p-8 max-w-sm sm:max-w-2xl md:max-w-4xl mx-auto w-full">
         {/* Header */}
         <div className="text-right mb-6">
           <p className="text-white text-sm font-semibold">
@@ -320,6 +323,23 @@ export default function HomeScreen({ onSelectStory }) {
             </button>
           </div>
         )}
+        </div>
+      </div>
+
+      {/* Bottom Navigation Bar - 75px height */}
+      <div className="fixed bottom-0 left-0 right-0 z-50" style={{ height: '75px', backgroundColor: '#D4E89E', borderTop: '1px solid #000', display: 'flex', justifyContent: 'space-around', alignItems: 'center', paddingBottom: '9px', paddingTop: '10px' }}>
+        <button onClick={() => setActiveTab('Home')} className="flex flex-col items-center justify-center flex-1 h-full transition-opacity hover:opacity-80" style={{ opacity: activeTab === 'Home' ? 1 : 0.6 }}>
+          <img src={navHome} alt="בית" style={{ width: '56px', height: '56px', objectFit: 'contain' }} />
+          <span style={{ fontFamily: '"Heebo", sans-serif', fontSize: '11px', fontWeight: 'bold', color: '#000', marginTop: '4px' }}>בית</span>
+        </button>
+        <button onClick={() => { setActiveTab('Play'); onSelectStory(null); }} className="flex flex-col items-center justify-center flex-1 h-full transition-opacity hover:opacity-80" style={{ opacity: activeTab === 'Play' ? 1 : 0.6 }}>
+          <img src={navRead} alt="קרא" style={{ width: '56px', height: '56px', objectFit: 'contain' }} />
+          <span style={{ fontFamily: '"Heebo", sans-serif', fontSize: '11px', fontWeight: 'bold', color: '#000', marginTop: '4px' }}>קרא</span>
+        </button>
+        <button onClick={() => setActiveTab('Rewards')} className="flex flex-col items-center justify-center flex-1 h-full transition-opacity hover:opacity-80" style={{ opacity: activeTab === 'Rewards' ? 1 : 0.6 }}>
+          <img src={navAwards} alt="פרסים" style={{ width: '56px', height: '56px', objectFit: 'contain' }} />
+          <span style={{ fontFamily: '"Heebo", sans-serif', fontSize: '11px', fontWeight: 'bold', color: '#000', marginTop: '4px' }}>פרסים</span>
+        </button>
       </div>
     </div>
   );
