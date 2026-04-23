@@ -257,67 +257,45 @@ export default function StoryScreen({ storyId, onBack }) {
 
       {/* Words Container */}
       <div className="flex-1 overflow-y-auto p-8 flex flex-col items-center justify-center">
-        <div className="max-w-4xl w-full leading-relaxed" style={{ wordSpacing: '0.5rem' }}>
-          {allWords.map((word, idx) => {
-            const isPast = idx < currentWordIndex;
-            const isActive = idx === currentWordIndex;
+        <div className="max-w-4xl w-full text-center leading-loose">
+          <p style={{ fontSize: '28px', lineHeight: '1.8', fontWeight: '600' }}>
+            {allWords.map((word, idx) => {
+              const isPast = idx < currentWordIndex;
+              const isActive = idx === currentWordIndex;
 
-            let bgColor = 'transparent';
-            let textColor = '#636e72';
-            if (isActive) {
-              if (hintLevel >= 3) bgColor = '#ff7675';
-              else if (hintLevel >= 1) bgColor = '#ffc107';
-              else bgColor = '#ffd93d';
-              textColor = '#2d3436';
-            } else if (isPast) {
-              textColor = '#6bcb77';
-            }
-
-            let displayWord = word;
-            if (isActive) {
-              if (showLetterBreak) {
-                displayWord = formatWithDots(word);
-              } else if (lettersReadInWord > 0) {
-                const [read, unread] = splitWordByProgress(word, lettersReadInWord);
-                return (
-                  <span
-                    key={idx}
-                    style={{
-                      display: 'inline',
-                      backgroundColor: bgColor,
-                      color: textColor,
-                      opacity: isPast ? 0.4 : 1,
-                      padding: '8px 12px',
-                      borderRadius: '8px',
-                      fontSize: '28px',
-                      fontWeight: '600',
-                    }}
-                  >
-                    <span style={{ color: '#0984e3' }}>{read}</span>
-                    <span>{unread}</span>
-                  </span>
-                );
+              let bgColor = 'transparent';
+              let textColor = '#636e72';
+              if (isActive) {
+                if (hintLevel >= 3) bgColor = '#ff7675';
+                else if (hintLevel >= 1) bgColor = '#ffc107';
+                else bgColor = '#ffd93d';
+                textColor = '#2d3436';
+              } else if (isPast) {
+                textColor = '#6bcb77';
               }
-            }
 
-            return (
-              <span
-                key={idx}
-                style={{
-                  display: 'inline',
-                  backgroundColor: bgColor,
-                  color: textColor,
-                  opacity: isPast ? 0.4 : 1,
-                  padding: '8px 12px',
-                  borderRadius: '8px',
-                  fontSize: '28px',
-                  fontWeight: '600',
-                }}
-              >
-                {displayWord}
-              </span>
-            );
-          })}
+              let displayWord = word;
+              if (isActive) {
+                if (showLetterBreak) {
+                  displayWord = formatWithDots(word);
+                } else if (lettersReadInWord > 0) {
+                  const [read, unread] = splitWordByProgress(word, lettersReadInWord);
+                  return (
+                    <span key={idx} style={{ backgroundColor: bgColor, color: textColor, opacity: isPast ? 0.4 : 1, padding: '4px 8px', borderRadius: '4px' }}>
+                      <span style={{ color: '#0984e3' }}>{read}</span>
+                      <span>{unread}</span>
+                    </span>
+                  );
+                }
+              }
+
+              return (
+                <span key={idx} style={{ backgroundColor: bgColor, color: textColor, opacity: isPast ? 0.4 : 1, padding: '4px 8px', borderRadius: '4px' }}>
+                  {displayWord}
+                </span>
+              );
+            }).reduce((prev, curr, idx) => [prev, ' ', curr], [])}
+          </p>
         </div>
       </div>
 
