@@ -209,13 +209,13 @@ export default function StoryScreen({ storyId, onBack }) {
   }, [isComplete, sessionStats, storyId, completeStory]);
 
   return (
-    <div className="min-h-screen bg-white flex flex-col text-right" dir="rtl">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col text-right" dir="rtl">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 flex justify-between items-center">
-        <h1 className="text-xl font-bold">{storyObj.title}</h1>
+      <div className="bg-gradient-to-r from-primary to-primary-light text-white p-6 flex justify-between items-center shadow-md">
+        <h1 className="text-2xl font-bold">{storyObj.title}</h1>
         <button
           onClick={onBack}
-          className="text-white hover:opacity-80 transition text-2xl"
+          className="text-white hover:opacity-80 transition text-3xl"
         >
           ×
         </button>
@@ -243,35 +243,34 @@ export default function StoryScreen({ storyId, onBack }) {
 
       {/* Hints */}
       {hintLevel >= 2 && !showLetterBreak && syllables && (
-        <div className="flex justify-center mt-4">
-          <div className="bg-yellow-100 border-2 border-yellow-400 rounded-lg px-4 py-2">
-            <p className="text-lg font-bold text-gray-700 font-mono">{syllables}</p>
+        <div className="flex justify-center mt-6 px-4">
+          <div className="bg-yellow-100 border-2 border-yellow-400 rounded-xl px-6 py-3">
+            <p className="text-3xl font-bold text-gray-800 font-mono tracking-wider">{syllables}</p>
           </div>
         </div>
       )}
       {hintLevel >= 3 && (
-        <div className="text-center text-sm text-red-600 font-medium mt-1">
+        <div className="text-center text-base text-red-600 font-bold mt-2">
           🔊 {hintLevel >= 4 ? 'Moving forward...' : 'Listening...'}
         </div>
       )}
 
       {/* Words Container */}
-      <div className="flex-1 overflow-y-auto p-6 flex items-center justify-center">
-        <div className="flex flex-wrap justify-center gap-2 max-w-2xl">
+      <div className="flex-1 overflow-y-auto p-8 flex flex-col items-center justify-center">
+        <div className="max-w-3xl w-full">
           {allWords.map((word, idx) => {
             const isPast = idx < currentWordIndex;
             const isActive = idx === currentWordIndex;
-            const isDone = isPast;
 
             let bgColor = 'transparent';
-            let textColor = '#999';
+            let textColor = '#636e72';
             if (isActive) {
-              if (hintLevel >= 3) bgColor = '#FF6B6B';
-              else if (hintLevel >= 1) bgColor = '#FFB300';
-              else bgColor = '#FFD700';
-              textColor = '#333';
-            } else if (isDone) {
-              textColor = '#4CAF50';
+              if (hintLevel >= 3) bgColor = '#ff7675';
+              else if (hintLevel >= 1) bgColor = '#ffc107';
+              else bgColor = '#ffd93d';
+              textColor = '#2d3436';
+            } else if (isPast) {
+              textColor = '#6bcb77';
             }
 
             let displayWord = word;
@@ -283,14 +282,14 @@ export default function StoryScreen({ storyId, onBack }) {
                 return (
                   <span
                     key={idx}
-                    className="mx-1 px-2 py-1 rounded transition"
+                    className="inline-block mx-2 px-3 py-2 rounded-lg transition text-2xl font-semibold"
                     style={{
                       backgroundColor: bgColor,
                       color: textColor,
-                      opacity: isPast ? 0.35 : 1,
+                      opacity: isPast ? 0.4 : 1,
                     }}
                   >
-                    <span style={{ color: '#2196F3' }}>{read}</span>
+                    <span style={{ color: '#0984e3' }}>{read}</span>
                     <span>{unread}</span>
                   </span>
                 );
@@ -300,11 +299,11 @@ export default function StoryScreen({ storyId, onBack }) {
             return (
               <span
                 key={idx}
-                className="mx-1 px-2 py-1 rounded transition"
+                className="inline-block mx-2 px-3 py-2 rounded-lg transition text-2xl font-semibold"
                 style={{
                   backgroundColor: bgColor,
                   color: textColor,
-                  opacity: isPast ? 0.35 : 1,
+                  opacity: isPast ? 0.4 : 1,
                 }}
               >
                 {displayWord}
@@ -316,45 +315,43 @@ export default function StoryScreen({ storyId, onBack }) {
 
       {/* Completion Screen */}
       {isComplete && sessionStats && (
-        <div className="bg-gradient-to-b from-blue-50 to-white p-6 border-t-2 border-blue-200 text-center">
-          <p className="text-lg font-bold text-gray-900 mb-3">🎉 Story Complete!</p>
-          <div className="text-4xl mb-3">
+        <div className="bg-gradient-to-b from-purple-50 to-white p-8 border-t-4 border-purple-300 text-center">
+          <p className="text-3xl font-bold text-gray-900 mb-4">🎉 סיפור הושלם!</p>
+          <div className="text-5xl mb-6 tracking-widest">
             {Array.from({ length: 3 }).map((_, i) => (
               <span key={i}>{i < sessionStats.starsEarned ? '⭐' : '☆'}</span>
             ))}
           </div>
-          <p className="text-sm text-gray-600 mb-4">
+          <p className="text-lg text-gray-600 mb-6 font-medium">
             {sessionStats.durationSeconds}s • {sessionStats.wordsPerMinute} WPM • {Math.round(sessionStats.accuracy * 100)}%
           </p>
           <button
             onClick={onBack}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition"
+            className="bg-primary hover:bg-primary-light text-white px-8 py-3 rounded-lg transition text-lg font-bold"
           >
-            Back to Stories
+            חזור לסיפורים
           </button>
         </div>
       )}
 
       {/* Mic Bar */}
       {!isComplete && (
-        <div className="bg-white border-t-2 border-gray-200 p-4 flex justify-center gap-3">
+        <div className="bg-white border-t-4 border-gray-200 p-6 flex flex-col items-center gap-4">
           <button
             onClick={isListening ? stop : start}
-            className={`w-16 h-16 rounded-full flex items-center justify-center text-white text-xl transition ${
-              isListening ? 'bg-red-500 hover:bg-red-600' : 'bg-blue-500 hover:bg-blue-600'
+            className={`w-20 h-20 rounded-full flex items-center justify-center text-white text-4xl transition shadow-lg ${
+              isListening ? 'bg-red-500 hover:bg-red-600 animate-pulse' : 'bg-primary hover:bg-primary-light'
             }`}
           >
-            {isListening ? '🎤' : '🔇'}
+            {isListening ? '🎤' : '🔊'}
           </button>
-          <div className="flex items-center text-sm">
-            <p className={isListening ? 'text-red-600 font-medium' : 'text-gray-600'}>
-              {!isSupported
-                ? 'Speech recognition not supported'
-                : isListening
-                ? 'Listening... Read the highlighted word!'
-                : 'Tap to listen'}
-            </p>
-          </div>
+          <p className={`text-lg font-bold text-center ${isListening ? 'text-red-600' : 'text-gray-700'}`}>
+            {!isSupported
+              ? 'הקול לא נתמך'
+              : isListening
+              ? '👂 קראו את המילה בקול!'
+              : 'לחצו להאזין'}
+          </p>
         </div>
       )}
     </div>
