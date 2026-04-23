@@ -119,13 +119,13 @@ export default function HomeScreen({ onSelectStory }) {
       <div className="absolute inset-0 pointer-events-none"></div>
 
       {/* Content */}
-      <div className="relative z-10 flex-1 flex flex-col p-6 max-w-3xl mx-auto w-full">
+      <div className="relative z-10 flex-1 flex flex-col p-4 sm:p-6 md:p-8 max-w-sm sm:max-w-2xl md:max-w-4xl mx-auto w-full">
         {/* Header */}
         <div className="text-right mb-6">
           <p className="text-white text-sm font-semibold">
             יום {dayName} · יום {daysSinceLaunch}
           </p>
-          <h1 className="text-5xl font-bold text-white mt-2">היי, לביא 👋</h1>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mt-2">היי, לביא 👋</h1>
           <p className="text-white text-sm mt-3 opacity-90">
             {starsNeeded > 0
               ? `חסרים לך עוד ${starsNeeded} כוכבים להשלמת פרק ${currentEpisode}`
@@ -139,7 +139,7 @@ export default function HomeScreen({ onSelectStory }) {
             onClick={() => onSelectStory(storyToContinue.story.id)}
             className="w-full bg-white rounded-2xl p-5 mb-6 shadow-lg hover:shadow-xl transition text-right flex gap-4 items-center transform hover:scale-105"
           >
-            <div className="w-20 h-24 bg-gradient-to-br from-blue-200 to-blue-100 rounded-lg flex items-center justify-center text-5xl flex-shrink-0 shadow">
+            <div className="w-16 h-20 sm:w-20 sm:h-24 bg-gradient-to-br from-blue-200 to-blue-100 rounded-lg flex items-center justify-center text-3xl sm:text-5xl flex-shrink-0 shadow">
               📖
             </div>
             <div className="flex-1">
@@ -169,27 +169,27 @@ export default function HomeScreen({ onSelectStory }) {
         )}
 
         {/* Stats grid */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-yellow-200 rounded-3xl p-6 shadow-lg text-center transform hover:scale-105 transition">
-            <div className="text-5xl mb-2">📅</div>
-            <div className="text-3xl font-bold text-gray-800 mb-1">{state.streakDays}</div>
-            <div className="text-xs font-bold text-gray-700">רצף ימים</div>
+        <div className="grid grid-cols-2 gap-2 sm:gap-4">
+          <div className="bg-yellow-200 rounded-2xl sm:rounded-3xl p-3 sm:p-6 shadow-lg text-center transform hover:scale-105 transition">
+            <div className="text-3xl sm:text-5xl mb-2">📅</div>
+            <div className="text-xl sm:text-3xl font-bold text-gray-800 mb-1">{state.streakDays}</div>
+            <div className="text-xs sm:text-sm font-bold text-gray-700">רצף ימים</div>
             <div className="mt-1 text-xl">🔥</div>
           </div>
-          <div className="bg-blue-200 rounded-3xl p-6 shadow-lg text-center transform hover:scale-105 transition">
-            <div className="text-5xl mb-2">⏱️</div>
-            <div className="text-3xl font-bold text-gray-800 mb-1">{state.totalPoints}</div>
-            <div className="text-xs font-bold text-gray-700">זמן מסך שנצבור</div>
+          <div className="bg-blue-200 rounded-2xl sm:rounded-3xl p-3 sm:p-6 shadow-lg text-center transform hover:scale-105 transition">
+            <div className="text-3xl sm:text-5xl mb-2">⏱️</div>
+            <div className="text-xl sm:text-3xl font-bold text-gray-800 mb-1">{state.totalPoints}</div>
+            <div className="text-xs sm:text-sm font-bold text-gray-700">זמן מסך שנצבור</div>
           </div>
-          <div className="bg-green-200 rounded-3xl p-6 shadow-lg text-center transform hover:scale-105 transition">
-            <div className="text-5xl mb-2">📖</div>
-            <div className="text-3xl font-bold text-gray-800 mb-1">{state.storiesCompleted}</div>
-            <div className="text-xs font-bold text-gray-700">סיפורים שהושלמו</div>
+          <div className="bg-green-200 rounded-2xl sm:rounded-3xl p-3 sm:p-6 shadow-lg text-center transform hover:scale-105 transition">
+            <div className="text-3xl sm:text-5xl mb-2">📖</div>
+            <div className="text-xl sm:text-3xl font-bold text-gray-800 mb-1">{state.storiesCompleted}</div>
+            <div className="text-xs sm:text-sm font-bold text-gray-700">סיפורים שהושלמו</div>
           </div>
-          <div className="bg-pink-200 rounded-3xl p-6 shadow-lg text-center transform hover:scale-105 transition">
-            <div className="text-5xl mb-2">⭐</div>
-            <div className="text-3xl font-bold text-gray-800 mb-1">{totalStars}</div>
-            <div className="text-xs font-bold text-gray-700">כוכבים שנאספו</div>
+          <div className="bg-pink-200 rounded-2xl sm:rounded-3xl p-3 sm:p-6 shadow-lg text-center transform hover:scale-105 transition">
+            <div className="text-3xl sm:text-5xl mb-2">⭐</div>
+            <div className="text-xl sm:text-3xl font-bold text-gray-800 mb-1">{totalStars}</div>
+            <div className="text-xs sm:text-sm font-bold text-gray-700">כוכבים שנאספו</div>
           </div>
         </div>
 

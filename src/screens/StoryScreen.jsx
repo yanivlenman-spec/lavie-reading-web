@@ -211,8 +211,8 @@ export default function StoryScreen({ storyId, onBack }) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col text-right" dir="rtl">
       {/* Header */}
-      <div className="bg-gradient-to-r from-primary to-primary-light text-white p-6 flex justify-between items-center shadow-md">
-        <h1 className="text-2xl font-bold">{storyObj.title}</h1>
+      <div className="bg-gradient-to-r from-primary to-primary-light text-white p-4 sm:p-6 flex justify-between items-center shadow-md">
+        <h1 className="text-lg sm:text-2xl font-bold">{storyObj.title}</h1>
         <button
           onClick={onBack}
           className="text-white hover:opacity-80 transition text-3xl"
@@ -256,9 +256,9 @@ export default function StoryScreen({ storyId, onBack }) {
       )}
 
       {/* Words Container */}
-      <div className="flex-1 overflow-y-auto p-8 flex flex-col items-center justify-center">
-        <div className="max-w-4xl w-full text-center leading-loose">
-          <p style={{ fontSize: '28px', lineHeight: '1.8', fontWeight: '600' }}>
+      <div className="flex-1 overflow-y-auto p-4 sm:p-8 flex flex-col items-center justify-center">
+        <div className="w-full max-w-2xl sm:max-w-4xl text-center leading-loose">
+          <p style={{ fontSize: 'clamp(18px, 5vw, 28px)', lineHeight: '1.8', fontWeight: '600' }}>
             {allWords.map((word, idx) => {
               const isPast = idx < currentWordIndex;
               const isActive = idx === currentWordIndex;
@@ -301,19 +301,19 @@ export default function StoryScreen({ storyId, onBack }) {
 
       {/* Completion Screen */}
       {isComplete && sessionStats && (
-        <div className="bg-gradient-to-b from-purple-50 to-white p-8 border-t-4 border-purple-300 text-center">
-          <p className="text-3xl font-bold text-gray-900 mb-4">🎉 סיפור הושלם!</p>
-          <div className="text-5xl mb-6 tracking-widest">
+        <div className="bg-gradient-to-b from-purple-50 to-white p-4 sm:p-8 border-t-4 border-purple-300 text-center">
+          <p className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">🎉 סיפור הושלם!</p>
+          <div className="text-3xl sm:text-5xl mb-6 tracking-widest">
             {Array.from({ length: 3 }).map((_, i) => (
               <span key={i}>{i < sessionStats.starsEarned ? '⭐' : '☆'}</span>
             ))}
           </div>
-          <p className="text-lg text-gray-600 mb-6 font-medium">
+          <p className="text-sm sm:text-lg text-gray-600 mb-6 font-medium">
             {sessionStats.durationSeconds}s • {sessionStats.wordsPerMinute} WPM • {Math.round(sessionStats.accuracy * 100)}%
           </p>
           <button
             onClick={onBack}
-            className="bg-primary hover:bg-primary-light text-white px-8 py-3 rounded-lg transition text-lg font-bold"
+            className="bg-primary hover:bg-primary-light text-white px-6 sm:px-8 py-2 sm:py-3 rounded-lg transition text-base sm:text-lg font-bold"
           >
             חזור לסיפורים
           </button>
@@ -322,16 +322,16 @@ export default function StoryScreen({ storyId, onBack }) {
 
       {/* Mic Bar */}
       {!isComplete && (
-        <div className="bg-white border-t-4 border-gray-200 p-6 flex flex-col items-center gap-4">
+        <div className="bg-white border-t-4 border-gray-200 p-4 sm:p-6 flex flex-col items-center gap-4">
           <button
             onClick={isListening ? stop : start}
-            className={`w-20 h-20 rounded-full flex items-center justify-center text-white text-4xl transition shadow-lg ${
+            className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center text-white text-2xl sm:text-4xl transition shadow-lg ${
               isListening ? 'bg-red-500 hover:bg-red-600 animate-pulse' : 'bg-primary hover:bg-primary-light'
             }`}
           >
             {isListening ? '🎤' : '🔊'}
           </button>
-          <p className={`text-lg font-bold text-center ${isListening ? 'text-red-600' : 'text-gray-700'}`}>
+          <p className={`text-base sm:text-lg font-bold text-center ${isListening ? 'text-red-600' : 'text-gray-700'}`}>
             {!isSupported
               ? 'הקול לא נתמך'
               : isListening
