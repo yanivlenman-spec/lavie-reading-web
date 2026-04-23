@@ -1,6 +1,4 @@
 {
-  "projectId": "prj_lavie_reading_web",
   "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "env": {}
+  "outputDirectory": "dist"
 }
