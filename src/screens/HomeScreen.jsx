@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { STORIES } from '../data/stories';
-import StatCard from '../components/StatCard';
 import PinInput from '../components/PinInput';
 
 const DAY_NAMES = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
@@ -114,15 +113,28 @@ export default function HomeScreen({ onSelectStory }) {
   }
 
   return (
-    <div dir="rtl" className="min-h-screen bg-gradient-to-b from-orange-50 to-white">
-      <div className="max-w-2xl mx-auto p-4">
+    <div dir="rtl" className="min-h-screen bg-gradient-to-b from-blue-400 to-blue-300 flex flex-col overflow-hidden">
+      {/* Scenic background */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-48 h-32 opacity-80">
+          <svg viewBox="0 0 200 160" className="w-full h-full">
+            <ellipse cx="100" cy="50" rx="60" ry="40" fill="white" opacity="0.7"/>
+            <ellipse cx="140" cy="60" rx="45" ry="35" fill="white" opacity="0.6"/>
+            <ellipse cx="60" cy="70" rx="50" ry="30" fill="white" opacity="0.65"/>
+          </svg>
+        </div>
+        <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-green-600 to-green-500 opacity-90"></div>
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 flex-1 flex flex-col p-6 max-w-3xl mx-auto w-full">
         {/* Header */}
-        <div className="text-right mb-8 pt-4">
-          <p className="text-sm text-gray-600 font-medium">
+        <div className="text-right mb-6">
+          <p className="text-white text-sm font-semibold">
             יום {dayName} · יום {daysSinceLaunch}
           </p>
-          <h1 className="text-4xl font-bold text-gray-900 mt-1">היי, לביא 👋</h1>
-          <p className="text-gray-600 mt-3">
+          <h1 className="text-5xl font-bold text-white mt-2">היי, לביא 👋</h1>
+          <p className="text-white text-sm mt-3 opacity-90">
             {starsNeeded > 0
               ? `חסרים לך עוד ${starsNeeded} כוכבים להשלמת פרק ${currentEpisode}`
               : `פרק ${currentEpisode} הושלם! 🎉`}
@@ -133,31 +145,31 @@ export default function HomeScreen({ onSelectStory }) {
         {storyToContinue && (
           <button
             onClick={() => onSelectStory(storyToContinue.story.id)}
-            className="w-full bg-white rounded-lg p-4 mb-6 shadow hover:shadow-md transition text-right flex gap-3 items-center"
+            className="w-full bg-white rounded-2xl p-5 mb-6 shadow-lg hover:shadow-xl transition text-right flex gap-4 items-center transform hover:scale-105"
           >
-            <div className="w-16 h-20 bg-gray-100 rounded flex items-center justify-center text-3xl flex-shrink-0">
+            <div className="w-20 h-24 bg-gradient-to-br from-blue-200 to-blue-100 rounded-lg flex items-center justify-center text-5xl flex-shrink-0 shadow">
               📖
             </div>
             <div className="flex-1">
               {storyToContinue.type === 'continue' ? (
                 <>
-                  <p className="text-xs text-gray-500 font-medium">המשך קריאה</p>
-                  <h3 className="font-bold text-gray-900 mt-1">{storyToContinue.story.title}</h3>
-                  <div className="w-full bg-gray-200 rounded h-1.5 mt-2 overflow-hidden">
+                  <p className="text-xs text-gray-500 font-bold uppercase">המשך קריאה</p>
+                  <h3 className="font-bold text-gray-900 mt-2 text-lg">{storyToContinue.story.title}</h3>
+                  <div className="w-full bg-gray-300 rounded-full h-2 mt-3 overflow-hidden">
                     <div
-                      className="h-full bg-yellow-400"
+                      className="h-full bg-yellow-400 transition-all"
                       style={{ width: `${(storyToContinue.stars / 3) * 100}%` }}
                     />
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-600 mt-2 font-medium">
                     {Math.round((storyToContinue.stars / 3) * 100)}% · סיפור {storyToContinue.storyNumber}
                   </p>
                 </>
               ) : (
                 <>
-                  <p className="text-xs text-gray-500 font-medium">קרא עוד מסדרה {storyToContinue.episodeId}</p>
-                  <h3 className="font-bold text-gray-900 mt-1">{storyToContinue.story.title}</h3>
-                  <p className="text-xs text-gray-500 mt-1">{DIFFICULTY_LABEL[storyToContinue.story.difficulty]}</p>
+                  <p className="text-xs text-gray-500 font-bold uppercase">קרא עוד מסדרה {storyToContinue.episodeId}</p>
+                  <h3 className="font-bold text-gray-900 mt-2 text-lg">{storyToContinue.story.title}</h3>
+                  <p className="text-xs text-gray-600 mt-1 font-medium">{DIFFICULTY_LABEL[storyToContinue.story.difficulty]}</p>
                 </>
               )}
             </div>
@@ -165,14 +177,27 @@ export default function HomeScreen({ onSelectStory }) {
         )}
 
         {/* Stats grid */}
-        <div className="space-y-3 mb-6">
-          <div className="flex gap-3">
-            <StatCard label="רצף ימים" value={`${state.streakDays} 🔥`} emoji="📅" bgColor="#FFE0B2" />
-            <StatCard label="זמן מסך שנצבר" value={`${state.totalPoints} דק'`} emoji="⏱️" bgColor="#B3E5FC" />
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-yellow-200 rounded-3xl p-6 shadow-lg text-center transform hover:scale-105 transition">
+            <div className="text-5xl mb-2">📅</div>
+            <div className="text-3xl font-bold text-gray-800 mb-1">{state.streakDays}</div>
+            <div className="text-xs font-bold text-gray-700">רצף ימים</div>
+            <div className="mt-1 text-xl">🔥</div>
           </div>
-          <div className="flex gap-3">
-            <StatCard label="סיפורים שהושלמו" value={state.storiesCompleted} emoji="📖" bgColor="#C8E6C9" />
-            <StatCard label="כוכבים שנאספו" value={totalStars} emoji="⭐" bgColor="#F8BBD0" />
+          <div className="bg-blue-200 rounded-3xl p-6 shadow-lg text-center transform hover:scale-105 transition">
+            <div className="text-5xl mb-2">⏱️</div>
+            <div className="text-3xl font-bold text-gray-800 mb-1">{state.totalPoints}</div>
+            <div className="text-xs font-bold text-gray-700">זמן מסך שנצבור</div>
+          </div>
+          <div className="bg-green-200 rounded-3xl p-6 shadow-lg text-center transform hover:scale-105 transition">
+            <div className="text-5xl mb-2">📖</div>
+            <div className="text-3xl font-bold text-gray-800 mb-1">{state.storiesCompleted}</div>
+            <div className="text-xs font-bold text-gray-700">סיפורים שהושלמו</div>
+          </div>
+          <div className="bg-pink-200 rounded-3xl p-6 shadow-lg text-center transform hover:scale-105 transition">
+            <div className="text-5xl mb-2">⭐</div>
+            <div className="text-3xl font-bold text-gray-800 mb-1">{totalStars}</div>
+            <div className="text-xs font-bold text-gray-700">כוכבים שנאספו</div>
           </div>
         </div>
 
