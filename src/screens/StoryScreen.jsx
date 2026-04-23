@@ -222,9 +222,9 @@ export default function StoryScreen({ storyId, onBack }) {
       </div>
 
       {/* Progress bar */}
-      <div className="h-1 bg-gray-200">
+      <div className="h-1 bg-gray-200 rounded-full overflow-hidden">
         <div
-          className="h-1 bg-yellow-400 transition-all"
+          className="h-1 bg-yellow-400 transition-all rounded-full"
           style={{ width: `${(currentWordIndex / totalWords) * 100}%` }}
         />
       </div>

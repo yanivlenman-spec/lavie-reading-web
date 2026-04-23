@@ -288,7 +288,7 @@ export default function HomeScreen({ onSelectStory }) {
                   <button
                     key={mins}
                     onClick={() => setDeductAmount(String(mins))}
-                    className="py-2 rounded bg-green-100 hover:bg-green-200 transition text-sm font-medium text-gray-900"
+                    className="py-2 rounded-lg bg-green-100 hover:bg-green-200 transition text-sm font-medium text-gray-900"
                   >
                     {mins} דק'
                   </button>
@@ -297,7 +297,7 @@ export default function HomeScreen({ onSelectStory }) {
               <div className="flex gap-2 mb-6">
                 <button
                   onClick={handleDeduct}
-                  className="px-4 py-2 bg-red-500 text-white rounded font-bold hover:bg-red-600 transition text-sm"
+                  className="px-4 py-2 bg-red-500 text-white rounded-lg font-bold hover:bg-red-600 transition text-sm"
                 >
                   נכה
                 </button>
@@ -306,7 +306,7 @@ export default function HomeScreen({ onSelectStory }) {
                   value={deductAmount}
                   onChange={(e) => setDeductAmount(e.target.value)}
                   placeholder="כמה דקות?"
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded font-medium text-right"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg font-medium text-right"
                 />
               </div>
             </div>
