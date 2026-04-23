@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { STORIES } from '../data/stories';
 import PinInput from '../components/PinInput';
+import homeBackground from '../assets/home-background.webp';
 
 const DAY_NAMES = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
 const DIFFICULTY_LABEL = { 1: 'קל ⭐', 2: 'בינוני ⭐⭐', 3: 'מאתגר ⭐⭐⭐' };
@@ -113,7 +114,7 @@ export default function HomeScreen({ onSelectStory }) {
   }
 
   return (
-    <div dir="rtl" className="min-h-screen flex flex-col overflow-hidden" style={{ backgroundImage: `url(${require('../assets/home-background.webp')})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+    <div dir="rtl" className="min-h-screen flex flex-col overflow-hidden" style={{ backgroundImage: `url(${homeBackground})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
       {/* Background image overlay */}
       <div className="absolute inset-0 pointer-events-none"></div>
 
